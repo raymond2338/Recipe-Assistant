@@ -72,7 +72,6 @@ class RecipeAssistant:
         except requests.exceptions.RequestException as e:
             raise Exception(f"Error fetching recipe details: {e}")
 
-
 def process_message(message: str, assistant: RecipeAssistant):
     """Process user message and determine response type."""
     if not message.strip():
@@ -93,19 +92,17 @@ def process_message(message: str, assistant: RecipeAssistant):
             results = assistant.search_recipes(**function_args)
             return response.choices[0].message.content, results, True
         else:
-            # Handle regular conversation
-            chat_response = assistant.chat(message)
-            return chat_response, None, False
+            # Respond politely to non-food-related queries
+            return "I'm here to assist with food, recipes, and cooking-related questions only. Please ask me something related to food!", None, False
     except Exception as e:
         raise Exception(f"Error processing message: {str(e)}")
-
 
 def main():
     """Streamlit UI setup and app entry point."""
     st.set_page_config(page_title="AI Recipe Assistant", page_icon="🍳", layout="wide")
 
     st.title("🍳 AI Recipe Assistant")
-    st.write("Chat with me about anything! I can help you find recipes or just have a friendly conversation.")
+    st.write("I'm here to help with recipes, cooking tips, and food-related queries!")
 
     mistral_api_key = st.sidebar.text_input("Mistral API Key", type="password")
     spoonacular_api_key = st.sidebar.text_input("Spoonacular API Key", type="password")
@@ -129,7 +126,7 @@ def main():
                             st.write(f"Servings: {recipe['servings']}")
                             st.write(f"[View Recipe]({recipe['sourceUrl']})")
 
-    if prompt := st.chat_input("Chat with me or ask about recipes!"):
+    if prompt := st.chat_input("Ask me about food or recipes!"):
         if not mistral_api_key or not spoonacular_api_key:
             st.error("Please enter your API keys in the sidebar to continue.")
             return
